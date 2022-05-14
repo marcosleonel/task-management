@@ -1,0 +1,10 @@
+{
+  "name": "task-management",
+  "version": "1.0.0",
+  "description": "A task management tool for subscribed users.",
+  "main": "index.js",
+  "repository": "https://github.com/marcosleonel/task-management",
+  "author": "Marcos Leonel <leonel.coder@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
