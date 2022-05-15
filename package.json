@@ -10,7 +10,11 @@
   "engines": {
     "node": "16"
   },
+  "lint-staged" : {
+    "*.js": ["standard"]
+  },
   "devDependencies": {
+    "lint-staged": "^12.4.1",
     "standard": "^17.0.0"
   }
 }
