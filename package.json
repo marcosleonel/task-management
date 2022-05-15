@@ -9,13 +9,13 @@
   "private": false,
   "scripts": {
     "clean": "rimraf dist",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:staged": "jest --changedSince",
+    "test": "jest --coverage=true",
+    "test:watch": "jest --watch --coverage=true",
+    "test:staged": "jest --onlyChanged --coverage=true",
     "build": "yarn clean && tsc --build",
     "dev": "ts-node ./src/index.ts",
     "prepare": "husky install",
-    "lint:staged": "ts-standard && yarn test"
+    "lint:staged": "ts-standard && yarn test:staged"
   },
   "engines": {
     "node": "16"
