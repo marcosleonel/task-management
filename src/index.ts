@@ -1,15 +1,14 @@
-import express from 'express';
-import morgan from 'morgan';
+import express from 'express'
+import morgan from 'morgan'
 
-const app = express();
-const port = Number(process.env.PORT ?? 8080);
+const app = express()
+const port = Number(process.env.PORT ?? 8080)
 
-app.use(morgan('dev'));
-
+app.use(morgan('dev'))
 app.get('/healthy', (_, res) => {
-  res.json('HEALTHY');
-});
+  res.json('HEALTHY')
+})
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Task Management started at: ${port}`);
-});
+  console.log(`Task Management started at: ${port}`)
+})
