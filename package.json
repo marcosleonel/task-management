@@ -13,16 +13,6 @@
   "engines": {
     "node": "16"
   },
-  "lint-staged": {
-    "*.js": [
-      "standard"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "devDependencies": {
     "husky": "^8.0.1",
     "jest": "^28.1.0",
