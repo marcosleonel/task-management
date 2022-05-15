@@ -9,13 +9,16 @@
   "private": false,
   "scripts": {
     "clean": "rimraf dist",
+    "build": "yarn clean && tsc --build",
+    "dev": "ts-node-dev --inspect=0.0.0.0:9229 --exit-child --respawn ./src/index.ts",
+    "start": "node dist/src/index.js",
+    "start:docker": "yarn build && yarn dev",
+    "db:console": "docker-compose exec db psql -h localhost -U postgres -d task_management",
     "test": "jest --coverage=true",
     "test:watch": "jest --watch --coverage=true",
     "test:staged": "jest --onlyChanged --coverage=true",
-    "build": "yarn clean && tsc --build",
-    "dev": "ts-node ./src/index.ts",
-    "prepare": "husky install",
-    "lint:staged": "ts-standard && yarn test:staged"
+    "lint:staged": "ts-standard && yarn test:staged",
+    "prepare": "husky install"
   },
   "engines": {
     "node": "16"
@@ -35,7 +38,7 @@
     "lint-staged": "^12.4.1",
     "rimraf": "^3.0.2",
     "standard": "^17.0.0",
-    "ts-node": "^10.7.0",
+    "ts-node-dev": "^1.1.8",
     "ts-standard": "^11.0.0",
     "typescript": "^4.6.4"
   },

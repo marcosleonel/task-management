@@ -11,5 +11,5 @@ app.get('/healthy', (_, res) => {
 })
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Task Management started at: http://${host}:${port}`)
+  console.log(`Task Management Started At: http://${host}:${port}`)
 })
