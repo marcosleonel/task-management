@@ -14,9 +14,13 @@
     "node": "16"
   },
   "devDependencies": {
+    "@types/node": "^17.0.33",
     "husky": "^8.0.1",
     "jest": "^28.1.0",
     "lint-staged": "^12.4.1",
     "standard": "^17.0.0"
+  },
+  "dependencies": {
+    "typescript": "^4.6.4"
   }
 }
