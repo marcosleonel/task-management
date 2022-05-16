@@ -19,7 +19,8 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "typeRoots": ["./node_modules/@types", "./typings"],
-    "jsx": "react"
+    "jsx": "react",
+    "types": ["node"]
   },
   "exclude": ["dist"]
 }

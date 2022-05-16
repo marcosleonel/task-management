@@ -1,5 +1,5 @@
-const path = require('path')
-const { createLogger, format, transports } = require('winston')
+import path from 'path'
+import { createLogger, format, transports } from 'winston'
 
 const {
   combine,
@@ -14,7 +14,7 @@ const logger = createLogger({
   format: combine(
     format.colorize(),
     format.json(),
-    label({ label: 'Node.js REST API' }),
+    label({ label: 'API' }),
     timestamp(),
     logFormat
   ),
@@ -44,4 +44,4 @@ const logger = createLogger({
   exitOnError: false
 })
 
-module.exports = logger
+export default logger

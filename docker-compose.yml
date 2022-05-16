@@ -9,9 +9,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    environment:
-      PORT: 8000
-      DB_URL: postgres://postgres@postgres/task_management
+    env_file: .env
     command: yarn start:docker
 
   db:
@@ -19,6 +17,4 @@ services:
     restart: always
     ports:
       - 5432:5432
-    environment:
-      POSTGRES_DB: task_management
-      POSTGRES_HOST_AUTH_METHOD: trust
+    env_file: .env

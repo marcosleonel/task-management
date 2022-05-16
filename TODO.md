@@ -11,6 +11,13 @@ config
 logger
 server
 
+## SERVER
+
+[ ] Healthy Check
+[ ] Custom Logger
+[ ] Graceful Shutdown
+[ ] 404 Response
+
 ## COMPONENT STRUCTURE
 
 * **Index**: the place to import the component dependencies to inject and export the component.
