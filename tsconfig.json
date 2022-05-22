@@ -22,5 +22,6 @@
     "jsx": "react",
     "types": ["node"]
   },
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "include": ["logger.d.ts"]
 }

@@ -1,9 +1,13 @@
-/*
- * For a detailed explanation regarding each configuration property and type check, visit:
- * https://jestjs.io/docs/configuration
- */
-export default {
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coverageProvider: 'v8'
+import type { Config } from '@jest/types';
+
+export default async (): Promise<Config.InitialOptions> => {
+  return {
+    verbose: true,
+    clearMocks: true,
+    collectCoverage: true,
+    coverageDirectory: 'coverage',
+    coverageProvider: 'v8',
+    preset: 'ts-jest',
+    testEnvironment: 'node'
+  }
 }

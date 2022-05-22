@@ -1,22 +1,37 @@
-import express from 'express'
-import morgan from 'morgan'
-
+import app from './app'
 import { dataSource } from './db'
+import logger from './logger'
 
 dataSource
   .initialize()
-  .then(() => console.log('Data Source has been initialized!'))
-  .catch(error => console.error('Error during Data Source initialization: ', error))
+  .then(() => logger.info('Database has been initialized!'))
+  .catch(error => logger.error('Error during database initialization: ', error))
 
-const app = express()
 const port = Number(process.env.PORT ?? 8080)
 const host = process.env.HOST ?? 'localhost'
-
-app.use(morgan('dev'))
-app.get('/healthy', (_, res) => {
-  res.json('HEALTHY')
+const server = app.listen(Number(process.env.PORT ?? 8080), '0.0.0.0', () => {
+  logger.info(`Task Management Started At: http://${host}:${port}`)
 })
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Task Management Started At: http://${host}:${port}`)
-})
+function  handleUnhandledRejectionError(unhandledRejectionError: Error) {
+  logger.error(unhandledRejectionError.stack);
+  process.exit(1)
+}
+
+function handleSigterm () {
+  logger.info('SIGTERM signal received.');
+  logger.info('Closing HTTP server...');
+
+  server.close(() => {
+    logger.info('Closing the database connection...');
+
+    dataSource.destroy();
+
+    logger.info('Database connection closed.');
+    logger.info('Closing HTTP server...');
+    process.exit(0); 
+  });
+}
+
+process.on('unhandledRejection', handleUnhandledRejectionError);
+process.on('SIGTERM', handleSigterm);
