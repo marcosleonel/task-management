@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(helmet())
 
-const apiVersion1 = '/api/v1'
+// const apiVersion1 = '/api/v1'
 // app.use(apiVersion1, userRoutes)
 
 app.use((_, res) => {
@@ -22,6 +22,5 @@ app.use((_, res) => {
 app.get('/healthy', (_, res) => {
   res.json('HEALTHY')
 })
-
 
 export default app

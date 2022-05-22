@@ -1,6 +1,7 @@
 /* Visit https://aka.ms/tsconfig.json to read more about this file */
 {
   "compilerOptions": {
+    "noImplicitAny": false,
     "incremental": true,
     "target": "es2017",
     "module": "commonjs",
@@ -18,10 +19,10 @@
     "rootDir": ".",
     "sourceMap": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types", "./typings"],
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
     "jsx": "react",
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
-  "exclude": ["dist"],
-  "include": ["logger.d.ts"]
+  "exclude": ["dist", "node_modules"],
+  "include": ["src/**/*/*.ts", "src/*.ts", "*.ts", ]
 }

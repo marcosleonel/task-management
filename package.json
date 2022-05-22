@@ -17,7 +17,7 @@
     "test": "NODE_ENV=test jest --coverage=true",
     "test:watch": "jest --watch --coverage=true",
     "test:staged": "jest --onlyChanged --coverage=true",
-    "lint:staged": "ts-standard && yarn test:staged",
+    "lint:staged": "yarn test:staged",
     "prepare": "husky install"
   },
   "engines": {

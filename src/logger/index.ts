@@ -1,3 +1,4 @@
+import { Format } from 'logform'
 import path from 'path'
 import { createLogger, format, transports } from 'winston'
 
@@ -8,7 +9,9 @@ const {
   printf
 } = format
 
-const logFormat = printf((info) => `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`)
+const logFormat: Format = printf((info): string => {
+  return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`
+})
 
 const logger = createLogger({
   format: combine(
@@ -29,7 +32,7 @@ const logger = createLogger({
   exceptionHandlers: [
     new (transports.Console)(),
     new transports.File({
-      filename: path.join(__dirname, '/logs/exceptions.log'),
+      filename: path.join(__dirname, '/logs/exceptions.log')
     })
   ],
 
