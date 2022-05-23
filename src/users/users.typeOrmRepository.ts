@@ -2,7 +2,6 @@ import { dataSource } from '../db';
 import { UserData, UserRepositoryResults, IUsersRepository } from './users.types';
 import { userSchema } from './users.schema';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
-import logger from '../logger';
 
 class UsersTypeOrmRepository implements IUsersRepository {
   async create (userData: UserData): Promise<UserRepositoryResults> {
