@@ -9,6 +9,7 @@ export interface IUserUseCases {
   addUser: (data: UserData) => Promise<UserRepositoryResults>
   listUsers: () => Promise<UserRepositoryResults>
   getUser: (id: string) => Promise<UserRepositoryResults>
+  getUserByEmail: (email: string) => Promise<UserRepositoryResults>
   updateUser: (userData: UserData) => Promise<UserRepositoryResults>
 }
 
@@ -22,6 +23,7 @@ export interface IUsersRepository {
   create: (data: UserData) => Promise<UserRepositoryResults>
   findAll: () => Promise<UserRepositoryResults>
   findById: (id: string) => Promise<UserRepositoryResults>
+  findByEmail: (email: string) => Promise<UserRepositoryResults>
   updateById: (data: UserData) => Promise<UserRepositoryResults>
   deleteById: (id: string) => Promise<UserRepositoryResults>
 }

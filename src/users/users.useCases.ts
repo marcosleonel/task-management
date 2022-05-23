@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt'
 import {
   IUsersRepository,
   IUserUseCases,
@@ -20,9 +21,11 @@ class UsersUseCases implements IUserUseCases {
     if (validation.errors.length) return validation
 
     try {
+      userData.password = await bcrypt.hash(userData.password, 10)
+
       const { data, success } = await this.userRepository.create(userData)
 
-      if (!success) throw new Error(`[UsersUseCases.addUser] Unable to add user. Data: \n ${data}\n Succes: \n ${success}`)
+      if (!success) throw new Error('[UsersUseCases.addUser] Unable to add user.')
 
       return { success, data }
     } catch (error: unknown) {
@@ -66,6 +69,22 @@ class UsersUseCases implements IUserUseCases {
     }
   }
 
+  async getUserByEmail (email: string): Promise<UserRepositoryResults> {
+    try {
+      const { data, success } = await this.userRepository.findByEmail(email)
+
+      if (!success) throw new Error('[UsersUseCases.getUserByEmail] Unable to get user')
+
+      return { success, data }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        data: null,
+        error
+      }
+    }
+  }
+
   async updateUser (userData: UserData): Promise<UserRepositoryResults> {
     try {
       const { data, success } = await this.userRepository.updateById(userData)
@@ -89,6 +108,31 @@ class UsersUseCases implements IUserUseCases {
       if (!success) throw new Error('[UsersUseCases.updateUser] Unable to delete user')
 
       return { success, data }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        data: null,
+        error
+      }
+    }
+  }
+
+  async comparePassword (receivedPassword, storedPassword): Promise<UserRepositoryResults> {
+    try {
+      if (!receivedPassword) throw new Error('[UserUseCases.comparePassword] received password missing')
+      if (!storedPassword) throw new Error('[UserUseCases.comparePassword] stored missing')
+
+      const success = await bcrypt.compare(receivedPassword, storedPassword)
+
+      if (!success) throw new Error('[UserUseCases.comparePassword] user not found')
+
+      return {
+        success,
+        data: {
+          receivedPassword,
+          storedPassword
+        }
+      }
     } catch (error: unknown) {
       return {
         success: false,

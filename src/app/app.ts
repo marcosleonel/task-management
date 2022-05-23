@@ -4,27 +4,33 @@ import morgan from 'morgan'
 import helmet from 'helmet'
 import passport from 'passport'
 
-import { configPassport, sessionMiddleware } from './app.helpers'
-import userRoutes from '../users/users.routes'
+import { configPassport, sessionMiddleware } from './app.helpers' 
+import { UsersUseCases, userRouter, UsersTypeOrmRepository } from '../users'
 
 const app = express()
+let passportMiddleware
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(morgan('dev'))
-app.use(helmet())
-app.use(sessionMiddleware)
-app.use(configPassport(passport))
+(async () => {
+  passportMiddleware = await configPassport(passport, new UsersUseCases(new UsersTypeOrmRepository()))
 
-const apiVersion1 = '/api/v1'
-app.use(apiVersion1, userRoutes)
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(morgan('dev'))
+  app.use(helmet())
+  app.use(sessionMiddleware)
+  app.use(passportMiddleware.initialize())
+  app.use(passportMiddleware.session())
 
-app.use((_, res) => {
-  res.status(404).json({ message: 'This route does not exist.' })
-})
+  const apiVersion1 = '/api/v1'
+  app.use(apiVersion1, userRouter)
 
-app.get('/healthy', (_, res) => {
-  res.json('HEALTHY')
-})
+  app.use((_, res) => {
+    res.status(404).json({ message: 'This route does not exist.' })
+  })
+
+  app.get('/healthy', (_, res) => {
+    res.json('HEALTHY')
+  })
+})()
 
 export default app

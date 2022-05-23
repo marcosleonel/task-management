@@ -102,6 +102,18 @@ class userController implements Controller {
       return res.status(500).json({ message: 'An internal error occured' })
     }
   }
+
+  async login (req: any, res: Response) {
+    try {
+      return res.status(200).json({
+        ...(req.sessionID && { sessionId: req.sessionID }),
+        message: 'Logged In'
+      })
+    } catch (error: unknown) {
+      logger.error(`[UserController.login]: ${error}`)
+      return res.status(500).json({ message: 'An internal error occured' })
+    }
+  }
 }
 
 export default userController

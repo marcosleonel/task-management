@@ -77,6 +77,28 @@ class UsersTypeOrmRepository implements IUsersRepository {
     }
   }
 
+  async findByEmail (email: string): Promise<UserRepositoryResults> {
+    try {
+      const userFound = await dataSource
+        .getRepository(userSchema)
+        .createQueryBuilder('users')
+        .where('email = :email', { email })
+        .getOne()
+      const success: boolean = !!(userFound && userFound.id)
+
+      return {
+        success,
+        data: userFound
+      }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        data: null,
+        error
+      }
+    }
+  }
+
   async updateById (userData: UserData): Promise<UserRepositoryResults> {
     try {
       const { email, password } = userData

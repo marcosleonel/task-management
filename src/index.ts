@@ -1,4 +1,4 @@
-import app from './app'
+import app from './app/app'
 import { dataSource } from './db'
 import logger from './logger'
 
