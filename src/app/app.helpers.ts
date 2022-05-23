@@ -3,15 +3,22 @@ import { NextFunction, Request, Response } from 'express'
 import { Strategy as LocalStrategy } from 'passport-local'
 import logger from '../logger'
 
+const MemoryStore = require('memorystore')(session)
+
 const sessionMiddleware = (req: Request, res: Response, next: NextFunction) => {
   return session({
-    secret: process.env.SESSION_SECRET,
+    cookie: { maxAge: 86400000 },
+    store: new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    }),
     resave: false,
     saveUninitialized: false,
+    secret: process.env.JWT_SECRET ?? 'fallback'
   })(req, res, next)
 }
 
-const configPassport = async (passportInstance, usersUseCases) => {
+
+const configPassport = async (passportInstance, usersUseCases, comparePassword, generateToken) => {
   passportInstance.use(
     new LocalStrategy(
       {
@@ -21,10 +28,11 @@ const configPassport = async (passportInstance, usersUseCases) => {
       async (email, password, done) => {
         try {
           const user = await usersUseCases.getUserByEmail(email)
-          const { success } = await usersUseCases.comparePassword(password, user.data.password)
+          const { success } = await comparePassword(password, user.data.password)
 
           if (!success) done(null, false)
-    
+
+          user.token = generateToken(user.data.id, process.env.JWT_SECRET)
           done(null, user)
         } catch (error: unknown) {
           logger.error(`[configPassport]: ${error}`)
@@ -35,7 +43,7 @@ const configPassport = async (passportInstance, usersUseCases) => {
   )
 
   passportInstance.serializeUser((user: any, done) => {
-    done(null, user.data.id)
+    done(null, user)
   })
 
   passportInstance.deserializeUser(async (_, id: string, done: any) => {
@@ -49,7 +57,5 @@ const configPassport = async (passportInstance, usersUseCases) => {
 
   return passportInstance
 }
-
-
 
 export { configPassport, sessionMiddleware }

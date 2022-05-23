@@ -15,7 +15,7 @@ export interface IUserUseCases {
 
 export type UserRepositoryResults = {
   success: boolean,
-  data: Object | Object[] | null
+  data: Object | Object[] | UserData | null
   error?: unknown | null 
 }
 
@@ -26,4 +26,13 @@ export interface IUsersRepository {
   findByEmail: (email: string) => Promise<UserRepositoryResults>
   updateById: (data: UserData) => Promise<UserRepositoryResults>
   deleteById: (id: string) => Promise<UserRepositoryResults>
+}
+
+export interface IUserController {
+  getAll: Function
+  getOne: Function
+  add: Function
+  updateOne: Function
+  deleteOne: Function
+  login: Function
 }

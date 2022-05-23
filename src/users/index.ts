@@ -1,4 +1,4 @@
-import userController from './users.controller'
+import UserController from './users.controller'
 import Users from './users.entity'
 import { userSchema } from './users.schema'
 import userRouter from './users.routes'
@@ -8,7 +8,7 @@ import type { UserData, UserRepositoryResults } from './users.types'
 
 
 export {
-  userController,
+  UserController,
   Users,
   userSchema,
   userRouter,

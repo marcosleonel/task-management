@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express'
 
-import type { Controller } from '../@types/controller'
+import type { IUserController, UserData } from './users.types'
 import UsersUseCases from './users.useCases'
 import UsersTypeOrmRepository from './users.typeOrmRepository'
 import logger from '../logger'
+import { generateToken, comparePassword } from './users.helpers'
 
-class userController implements Controller {
+class UserController implements IUserController {
   readonly useCases: UsersUseCases
 
   constructor() {
@@ -24,6 +25,10 @@ class userController implements Controller {
     try {
       const { email, password } = req.body
       const useCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const user = await useCases.getUserByEmail(email)
+
+      if (user) return res.status(409).json({ message: 'This e-mail was already registered'})
+
       const result = await useCases.addUser({ email, password })
 
       if (result.error) throw new Error(`${result.error}`)
@@ -104,11 +109,33 @@ class userController implements Controller {
   }
 
   async login (req: any, res: Response) {
+    if (!req.body) {
+      return res.status(400).json({ message: 'body is required' })
+    }
+
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).json({ message: 'email and password are required' })
+    } 
+    
     try {
-      return res.status(200).json({
-        ...(req.sessionID && { sessionId: req.sessionID }),
-        message: 'Logged In'
-      })
+      const { email, password } = req.body
+      const usersUseCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const result = await usersUseCases.getUserByEmail(email)
+
+      if (!result.success) {
+        return res.status(404).json({ message: 'The user or password is incorrect' })
+      }
+
+      const userData: UserData = result.data as UserData
+      const { success } = await comparePassword(password, userData.password as string)
+
+      if (!success) {
+        return res.status(400).json({ message: 'The user or password is incorrect' })
+      }
+
+      const token = generateToken(userData, process.env.JWT_SECRET as string)
+
+      return res.status(200).json({ ...userData, token })
     } catch (error: unknown) {
       logger.error(`[UserController.login]: ${error}`)
       return res.status(500).json({ message: 'An internal error occured' })
@@ -116,4 +143,4 @@ class userController implements Controller {
   }
 }
 
-export default userController
+export default UserController

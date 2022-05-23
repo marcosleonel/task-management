@@ -116,31 +116,6 @@ class UsersUseCases implements IUserUseCases {
       }
     }
   }
-
-  async comparePassword (receivedPassword, storedPassword): Promise<UserRepositoryResults> {
-    try {
-      if (!receivedPassword) throw new Error('[UserUseCases.comparePassword] received password missing')
-      if (!storedPassword) throw new Error('[UserUseCases.comparePassword] stored missing')
-
-      const success = await bcrypt.compare(receivedPassword, storedPassword)
-
-      if (!success) throw new Error('[UserUseCases.comparePassword] user not found')
-
-      return {
-        success,
-        data: {
-          receivedPassword,
-          storedPassword
-        }
-      }
-    } catch (error: unknown) {
-      return {
-        success: false,
-        data: null,
-        error
-      }
-    }
-  }
 }
 
 export default UsersUseCases
