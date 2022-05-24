@@ -1,3 +1,5 @@
+import { OperationResult } from "./subscriptions.types"
+
 const stripe = require('stripe')('sk_test_Ho24N7La5CVDtbmpjc377lJI') // This is a public sumple secret test mode API Key.
 
 class StripeAdapter {
@@ -28,14 +30,24 @@ class StripeAdapter {
 
       return {
         sucesss: true,
-        session
+        data: session
       }
     } catch (error) {
       return {
         success: false,
-        session: null,
+        data: null,
         error
       }
     }
   }
+
+  constructEvent(body: object, sig: any, endpointSecret: string): OperationResult {
+    // TODO: use the strip package to contruct event
+    return {
+      success: true,
+      data: { body, sig, endpointSecret }
+    }
+  }
 }
+
+export default StripeAdapter

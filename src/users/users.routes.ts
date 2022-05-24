@@ -1,12 +1,7 @@
 import { Router } from 'express'
-import { expressjwt } from 'express-jwt'
 
+import { jwtAuthenticate } from '../helpers/jwt-authenticate'
 import UsersController from './users.controller'
-
-const jwtAuthenticate = expressjwt({
-  secret: process.env.JWT_SECRET as string ?? 'fallback',
-  algorithms: ["HS256"]
-})
 
 const userRouter = Router()
 const usersController = new UsersController()
