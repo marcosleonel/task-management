@@ -1,7 +1,7 @@
 import Subscriptions from './subscriptions.entity'
 import StripeAdapter from './subscriptions.stripeAdapter'
-import { ISubscriptionsUseCases, OperationResult } from './subscriptions.types'
-import { UsersTypeOrmRepository } from '../users' 
+import { ISubscriptionsUseCases, OperationResult, PaymentStatus, StripeEvent, SubscriptionStatus } from './subscriptions.types'
+import { UserData, UsersTypeOrmRepository } from '../users' 
 
 class SubscriptionsUseCases implements ISubscriptionsUseCases {
   readonly subscriptionAdapter: StripeAdapter
@@ -12,11 +12,16 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
     this.userRepository = userRepository
   }
 
-  async createSubscriptionSession(): Promise<OperationResult> {
+  /**
+   * Creates a checkout session in order to the user complete the subscription process.
+   * @returns Promise<OperationResult>
+   * @see https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=checkout#create-session
+   */
+  async createCheckoutSession(): Promise<OperationResult> {
     try {
       const { success, data } = await this.subscriptionAdapter.createSession()
 
-      if (!success) throw new Error('[SubscriptionsUseCases.createSubscriptionSession] Unable to create session')
+      if (!success) throw new Error('[SubscriptionsUseCases.createCheckoutSession] Unable to create session')
 
       return { success, data }
     } catch (error: unknown) {
@@ -28,6 +33,13 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
     }
   }
 
+  /**
+   * Handles the subscription events in order to activate or deactivate the premium account
+   * @param body Object
+   * @param sig any
+   * @returns Promise<OperationResult>
+   * @see https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=checkout#provision-and-monitor
+   */
   async monitorSubscription(body: Object, sig: any): Promise<OperationResult> {
     try {
       const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string
@@ -35,14 +47,16 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
 
       if (!success) throw new Error('[SubscriptionsUseCases.monitorSubscription] Unable to create construct Event')
 
-      const subscriptions = new Subscriptions(data.type as string)
+      const event = data as StripeEvent
+      const subscriptions = new Subscriptions(event.type)
+      const customer = event.data.object.customer as string
 
       if (subscriptions.isPaymentEvent()) {
-        this.takePaymentAction(subscriptions.paymentStatus())
+        await this.takePaymentAction(subscriptions.paymentStatus(), customer)
       }
 
       if (subscriptions.isSubscriptionEvent()) {
-        this.takeSubscriptionAction(subscriptions.subscriptionStatus())
+        await this.takeSubscriptionAction(subscriptions.subscriptionStatus(), customer)
       }
 
       return { success, data }
@@ -55,12 +69,47 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
     }
   }
 
-  async takePaymentAction (paymentStatus) {
-    // TODO: change the `User.isSubscribed` value based on the payment status
+  /**
+   * Update the `is_subscribed` field based on the status info of a payment event
+   * @param paymentStatus String
+   * @param customer String
+   */
+  async takePaymentAction (paymentStatus: string, customer: string): Promise<void> {
+    const userQuery = await this.userRepository.findBySubscriptionId(customer)
+
+    if (!userQuery.success) {
+      throw new Error('[SubscriptionsUseCases.takePaymentAction] Unable subscription ID')
+    }
+
+    const isSubscribed = paymentStatus === PaymentStatus.PAID
+    const user = userQuery.data as UserData
+  
+    user.isSubscribed = isSubscribed
+    
+    const { success } = await this.userRepository.updateById(user)
+
+    if (!success) {
+      throw new Error('[SubscriptionsUseCases.takePaymentAction] Unable to update user subscription status')
+    }
   }
 
-  async takeSubscriptionAction (subscriptionStatus) {
-    // TODO: change the `User.isSubscribed` value based on the subscription status
+  async takeSubscriptionAction (subscriptionStatus: string, customer: string) {
+    const userQuery = await this.userRepository.findBySubscriptionId(customer)
+
+    if (!userQuery.success) {
+      throw new Error('[SubscriptionsUseCases.takePaymentAction] Unable subscription ID')
+    }
+
+    const isSubscribed = subscriptionStatus !== SubscriptionStatus.DELETED
+    const user = userQuery.data as UserData
+  
+    user.isSubscribed = isSubscribed
+    
+    const { success } = await this.userRepository.updateById(user)
+
+    if (!success) {
+      throw new Error('[SubscriptionsUseCases.takePaymentAction] Unable to update user subscription status')
+    }
   }
 }
 

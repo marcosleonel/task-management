@@ -32,7 +32,7 @@ class StripeAdapter {
         sucesss: true,
         data: session
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: null,
@@ -42,10 +42,19 @@ class StripeAdapter {
   }
 
   constructEvent(body: object, sig: any, endpointSecret: string): OperationResult {
-    // TODO: use the strip package to contruct event
-    return {
-      success: true,
-      data: { body, sig, endpointSecret }
+    try {
+      const data = stripe.webhooks.constructEvent(body, sig, endpointSecret);
+
+      return {
+        success: true,
+        data
+      }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        data: null,
+        error
+      }
     }
   }
 }

@@ -2,6 +2,10 @@ export type UserData = {
   id?: string | undefined | unknown
   email: string | unknown
   password: string | unknown
+  isSubscribed?: boolean
+  subscriptionId?: string | null
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface IUserUseCases {
@@ -24,6 +28,7 @@ export interface IUsersRepository {
   findAll: () => Promise<UserRepositoryResults>
   findById: (id: string) => Promise<UserRepositoryResults>
   findByEmail: (email: string) => Promise<UserRepositoryResults>
+  findBySubscriptionId: (subscriptionId: string) => Promise<UserRepositoryResults>
   updateById: (data: UserData) => Promise<UserRepositoryResults>
   deleteById: (id: string) => Promise<UserRepositoryResults>
 }

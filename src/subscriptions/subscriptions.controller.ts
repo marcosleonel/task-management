@@ -3,7 +3,7 @@ import { Request } from 'express-jwt'
 import logger from '../logger'
 
 import StripeAdapter from './subscriptions.stripeAdapter'
-import { ISusbscriptionsController } from './subscriptions.types'
+import { ISusbscriptionsController, StripeSession } from './subscriptions.types'
 import SubscriptionsUseCases from './subscriptions.useCases'
 import { UsersTypeOrmRepository } from '../users'
 
@@ -16,26 +16,27 @@ class SusbscriptionsController implements ISusbscriptionsController {
 
   async createSession (_, res: Response) {
     try {
-      const { success, data } = await this.useCases.createSubscriptionSession()
+      const { success, data } = await this.useCases.createCheckoutSession()
 
       if (!success) throw new Error('[SusbscriptionsController.createSession] Unable to create session')
 
-      return res.status(200).json({ message: 'Session created', data })
+      const session = data as StripeSession
+
+      return res.redirect(303, session.url)
     } catch (error: unknown) {
       logger.error(`[SusbscriptionsController.createSession]: ${error}`)
       return res.status(500).json({ message: 'An internal error occured' })
     }
-    
   }
 
   async handleEvent (req: Request, res: Response) {
     try {
       const sig = req.headers['stripe-signature']
-      const { success, data } = await this.useCases.monitorSubscription(req.body, sig)
+      const { success } = await this.useCases.monitorSubscription(req.body, sig)
 
       if (!success) throw new Error('[SusbscriptionsController.handleEvent] Unable to create session')
 
-      return res.status(200).json({ message: 'Session created', data })
+      return res.sendStatus(200)
     } catch (error: unknown) {
       logger.error(`[SusbscriptionsController.createSession]: ${error}`)
       return res.status(500).json({ message: 'An internal error occured' })

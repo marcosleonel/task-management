@@ -1,3 +1,5 @@
+import { PaymentStatus, SubscriptionStatus } from "./subscriptions.types";
+
 class Subscriptions {
   readonly eventType: string
 
@@ -20,10 +22,10 @@ class Subscriptions {
     if (!this.isPaymentEvent) throw new Error('[SubscriptionEntity.paymentStatus] Not a payment status');
 
     const enventTypes = {
-      'payment_intent.succeeded': 'paid',
-      'checkout.session.completed': 'paid',
-      'invoice.paid': 'paid',
-      'invoice.payment_failed': 'failed'
+      'payment_intent.succeeded': PaymentStatus.PAID,
+      'checkout.session.completed': PaymentStatus.PAID,
+      'invoice.paid': PaymentStatus.PAID,
+      'invoice.payment_failed': PaymentStatus.FAILED
     }
 
     return enventTypes[this.eventType]
@@ -44,9 +46,9 @@ class Subscriptions {
     if (!this.isSubscriptionEvent) throw new Error('[SubscriptionEntity.paymentStatus] Not a payment status');
 
     const enventTypes = {
-      'customer.subscription.created': 'created',
-      'customer.subscription.updated': 'updated',
-      'customer.subscription.deleted': 'deleted'
+      'customer.subscription.created': SubscriptionStatus.CREATED,
+      'customer.subscription.updated': SubscriptionStatus.UPDATED,
+      'customer.subscription.deleted': SubscriptionStatus.DELETED
     }
 
     return enventTypes[this.eventType]

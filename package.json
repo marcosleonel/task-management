@@ -18,7 +18,8 @@
     "test:watch": "jest --watch --coverage=true",
     "test:staged": "jest --onlyChanged --coverage=true",
     "lint:staged": "yarn test:staged",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "migrations:generate": "typeorm migration:generate -n"
   },
   "engines": {
     "node": "16"
