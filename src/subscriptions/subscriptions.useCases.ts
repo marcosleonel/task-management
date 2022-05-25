@@ -1,6 +1,13 @@
 import Subscriptions from './subscriptions.entity'
 import StripeAdapter from './subscriptions.stripeAdapter'
-import { ISubscriptionsUseCases, OperationResult, PaymentStatus, StripeEvent, SubscriptionStatus } from './subscriptions.types'
+import {
+  ISubscriptionsUseCases,
+  OperationResult,
+  PaymentStatus,
+  StripeEvent,
+  SubscriptionStatus,
+  StripeSession
+} from './subscriptions.types'
 import { UserData, UsersTypeOrmAdapter } from '../users' 
 
 class SubscriptionsUseCases implements ISubscriptionsUseCases {
@@ -20,12 +27,13 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
   async createCheckoutSession(userId: string, userEmail: string, appUrl: string): Promise<OperationResult> {
     try {
       const session = await this.subscriptionAdapter.createSession(userId, userEmail, appUrl)
-      const userQuery = await this.userRepository.findBySubscriptionId(session.id)
-      const isSubscribed = session.data?.payment_status === PaymentStatus.ACTIVE
+      const sessionData = session.data as StripeSession
+      const userQuery = await this.userRepository.findBySubscriptionId(sessionData.id)
+      const isSubscribed = sessionData.payment_status === PaymentStatus.ACTIVE
       const user = userQuery.data as UserData
     
       user.isSubscribed = isSubscribed 
-      user.subscriptionId = session.data?.id
+      user.subscriptionId = sessionData.id
       
       const { success, data, error } = await this.userRepository.updateById(user)
 
@@ -52,8 +60,9 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
   async finishCheckoutSession(sessionId: string): Promise<OperationResult> {
     try {
       const session = await this.subscriptionAdapter.retrieveSession(sessionId)
+      const sessionData = session.data as StripeSession
       const userQuery = await this.userRepository.findBySubscriptionId(sessionId)
-      const isSubscribed = session.data?.payment_status === PaymentStatus.ACTIVE
+      const isSubscribed = sessionData.payment_status === PaymentStatus.ACTIVE
       const user = userQuery.data as UserData
     
       user.isSubscribed = isSubscribed
