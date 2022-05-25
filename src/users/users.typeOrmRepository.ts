@@ -84,7 +84,7 @@ class UsersTypeOrmRepository implements IUsersRepository {
         .createQueryBuilder('users')
         .where('email = :email', { email })
         .getOne()
-      const success: boolean = !!(userFound && userFound.id)
+      const success: boolean = !!(userFound && userFound.email === email)
 
       return {
         success,

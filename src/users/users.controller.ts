@@ -25,9 +25,9 @@ class UserController implements IUserController {
     try {
       const { email, password } = req.body
       const useCases = new UsersUseCases(new UsersTypeOrmRepository())
-      const user = await useCases.getUserByEmail(email)
+      const { success } = await useCases.getUserByEmail(email)
 
-      if (user) return res.status(409).json({ message: 'This e-mail was already registered'})
+      if (success) return res.status(409).json({ message: 'This e-mail was already registered'})
 
       const result = await useCases.addUser({ email, password })
 

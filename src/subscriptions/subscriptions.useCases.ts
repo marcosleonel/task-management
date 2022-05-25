@@ -17,11 +17,13 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
    * @returns Promise<OperationResult>
    * @see https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=checkout#create-session
    */
-  async createCheckoutSession(): Promise<OperationResult> {
+  async createCheckoutSession(userId: string, userEmail: string, appUrl: string): Promise<OperationResult> {
     try {
-      const { success, data } = await this.subscriptionAdapter.createSession()
+      const { success, data, error } = await this.subscriptionAdapter.createSession(userId, userEmail, appUrl)
 
-      if (!success) throw new Error('[SubscriptionsUseCases.createCheckoutSession] Unable to create session')
+      if (!success) {
+        throw new Error(`[SubscriptionsUseCases.createCheckoutSession] Unable to create session: ${error}`)
+      }
 
       return { success, data }
     } catch (error: unknown) {

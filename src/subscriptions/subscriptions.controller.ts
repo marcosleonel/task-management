@@ -14,11 +14,17 @@ class SusbscriptionsController implements ISusbscriptionsController {
     this.useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
   }
 
-  async createSession (_, res: Response) {
+  async createSession (req: Request, res: Response) {
     try {
-      const { success, data } = await this.useCases.createCheckoutSession()
+      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+      const id = req.auth?.id as string
+      const email = req.auth?.email as string
+      const appUrl = `${req.protocol}://${req.hostname}`
+      const { success, data, error } = await useCases.createCheckoutSession(id, email, appUrl)
 
-      if (!success) throw new Error('[SusbscriptionsController.createSession] Unable to create session')
+      if (!success) {
+        throw new Error(`[SusbscriptionsController.createSession] Unable to create session ${error}`)
+      }
 
       const session = data as StripeSession
 
@@ -32,13 +38,14 @@ class SusbscriptionsController implements ISusbscriptionsController {
   async handleEvent (req: Request, res: Response) {
     try {
       const sig = req.headers['stripe-signature']
-      const { success } = await this.useCases.monitorSubscription(req.body, sig)
+      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+      const { success } = await useCases.monitorSubscription(req.body, sig)
 
       if (!success) throw new Error('[SusbscriptionsController.handleEvent] Unable to create session')
 
       return res.sendStatus(200)
     } catch (error: unknown) {
-      logger.error(`[SusbscriptionsController.createSession]: ${error}`)
+      logger.error(`[SusbscriptionsController.handleEvent]: ${error}`)
       return res.status(500).json({ message: 'An internal error occured' })
     }
   }

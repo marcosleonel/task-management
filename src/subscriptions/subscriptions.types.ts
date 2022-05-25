@@ -5,7 +5,7 @@ export type OperationResult = {
 }
 
 export interface ISubscriptionsUseCases {
-  createCheckoutSession: () => Promise<OperationResult>
+  createCheckoutSession: (userId: string, userEmail: string, appUrl: string) => Promise<OperationResult>
   monitorSubscription: (body: Object, sig: any) => Promise<OperationResult>
   takePaymentAction: (paymentStatus: string, customer: string) => Promise<void>
   takeSubscriptionAction: (subscriptionStatus: string, customer: string) => Promise<void>

@@ -1,6 +1,6 @@
-import { OperationResult } from "./subscriptions.types"
+import { OperationResult } from  './subscriptions.types'
 
-const stripe = require('stripe')('sk_test_Ho24N7La5CVDtbmpjc377lJI') // This is a public sumple secret test mode API Key.
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 class StripeAdapter {
   readonly priceId : string
@@ -9,7 +9,7 @@ class StripeAdapter {
     this.priceId = process.env.SUBSCRIPTION_PRICE_ID as string
   }
 
-  async createSession () {
+  async createSession (userId: string, userEmail: string, appUrl: string) {
     const sessionOptions: Object = {
       mode: 'subscription',
       line_items: [
@@ -18,9 +18,10 @@ class StripeAdapter {
           quantity: 1,
         },
       ],
-      success_url: 'https://x-team.com/?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'https://x-team.com/',
-
+      success_url: `${appUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/checkout-cancel`,
+      client_reference_id: userId,
+      customer_email: userEmail
     }
 
     let session: Object
@@ -29,7 +30,7 @@ class StripeAdapter {
       session = await stripe.checkout.sessions.create(sessionOptions)
 
       return {
-        sucesss: true,
+        success: true,
         data: session
       }
     } catch (error: unknown) {

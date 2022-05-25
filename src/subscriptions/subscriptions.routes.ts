@@ -12,3 +12,5 @@ subscriptionRouter.post(
   raw({type: 'application/json'}),
   subscriptionController.handleEvent
 )
+
+export default subscriptionRouter
