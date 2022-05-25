@@ -7,6 +7,7 @@ const subscriptionRouter = Router()
 const subscriptionController = new SubscriptionController()
 
 subscriptionRouter.get('/subscriptions/create-session', jwtAuthenticate, subscriptionController.createSession)
+subscriptionRouter.get('/subscriptions/finish-session', jwtAuthenticate, subscriptionController.finishSession)
 subscriptionRouter.post(
   '/subscriptions/webhook',
   raw({type: 'application/json'}),

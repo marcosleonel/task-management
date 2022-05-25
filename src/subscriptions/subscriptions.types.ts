@@ -6,6 +6,7 @@ export type OperationResult = {
 
 export interface ISubscriptionsUseCases {
   createCheckoutSession: (userId: string, userEmail: string, appUrl: string) => Promise<OperationResult>
+  finishCheckoutSession: (sessionId: string) => Promise<OperationResult>
   monitorSubscription: (body: Object, sig: any) => Promise<OperationResult>
   takePaymentAction: (paymentStatus: string, customer: string) => Promise<void>
   takeSubscriptionAction: (subscriptionStatus: string, customer: string) => Promise<void>
@@ -13,12 +14,14 @@ export interface ISubscriptionsUseCases {
 
 export interface ISusbscriptionsController {
   createSession: Function
+  finishSession: Function
   handleEvent: Function
 }
 
 export enum PaymentStatus {
-  PAID = 'paid',
-  FAILED = 'failed'
+  ACTIVE = 'active',
+  FAILED = 'failed',
+  TRIAL = 'trialing',
 }
 
 export enum SubscriptionStatus {

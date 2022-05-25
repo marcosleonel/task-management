@@ -22,9 +22,9 @@ class Subscriptions {
     if (!this.isPaymentEvent) throw new Error('[SubscriptionEntity.paymentStatus] Not a payment status');
 
     const enventTypes = {
-      'payment_intent.succeeded': PaymentStatus.PAID,
-      'checkout.session.completed': PaymentStatus.PAID,
-      'invoice.paid': PaymentStatus.PAID,
+      'payment_intent.succeeded': PaymentStatus.ACTIVE,
+      'checkout.session.completed': PaymentStatus.ACTIVE,
+      'invoice.paid': PaymentStatus.ACTIVE,
       'invoice.payment_failed': PaymentStatus.FAILED
     }
 

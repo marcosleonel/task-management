@@ -9,7 +9,7 @@ class StripeAdapter {
     this.priceId = process.env.SUBSCRIPTION_PRICE_ID as string
   }
 
-  async createSession (userId: string, userEmail: string, appUrl: string) {
+  async createSession (userId: string, userEmail: string, appUrl: string): Promise<OperationResult> {
     const sessionOptions: Object = {
       mode: 'subscription',
       line_items: [
@@ -42,9 +42,26 @@ class StripeAdapter {
     }
   }
 
-  constructEvent(body: object, sig: any, endpointSecret: string): OperationResult {
+  async retrieveSession (sessionId: string): Promise<OperationResult> {
     try {
-      const data = stripe.webhooks.constructEvent(body, sig, endpointSecret);
+      const session = await stripe.checkout.sessions.retrieve(sessionId)
+
+      return {
+        success: true,
+        data: session
+      }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        data: null,
+        error
+      }
+    }
+  }
+
+  async constructEvent(body: object, sig: any, endpointSecret: string): Promise<OperationResult> {
+    try {
+      const data = await stripe.webhooks.constructEvent(body, sig, endpointSecret);
 
       return {
         success: true,

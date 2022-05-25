@@ -35,6 +35,23 @@ class SusbscriptionsController implements ISusbscriptionsController {
     }
   }
 
+  async finishSession (req: Request, res: Response) {
+    try {
+      const { sessionId } = req.body
+      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+      const { success, error } = await useCases.finishCheckoutSession(sessionId)
+
+      if (!success) {
+        throw new Error(`[SusbscriptionsController.finishSession] Unable to finish session ${error}`)
+      }
+
+      return res.sendStatus(200)
+    } catch (error: unknown) {
+      logger.error(`[SusbscriptionsController.finishSession]: ${error}`)
+      return res.status(500).json({ message: 'An internal error occured' })
+    }
+  }
+
   async handleEvent (req: Request, res: Response) {
     try {
       const sig = req.headers['stripe-signature']

@@ -19,10 +19,49 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
    */
   async createCheckoutSession(userId: string, userEmail: string, appUrl: string): Promise<OperationResult> {
     try {
-      const { success, data, error } = await this.subscriptionAdapter.createSession(userId, userEmail, appUrl)
+      const session = await this.subscriptionAdapter.createSession(userId, userEmail, appUrl)
+      const userQuery = await this.userRepository.findBySubscriptionId(session.id)
+      const isSubscribed = session.data?.payment_status === PaymentStatus.ACTIVE
+      const user = userQuery.data as UserData
+    
+      user.isSubscribed = isSubscribed 
+      user.subscriptionId = session.data?.id
+      
+      const { success, data, error } = await this.userRepository.updateById(user)
 
       if (!success) {
         throw new Error(`[SubscriptionsUseCases.createCheckoutSession] Unable to create session: ${error}`)
+      }
+
+      return { success, data }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        data: null,
+        error
+      }
+    }
+  }
+
+  /**
+   * Takes the information about a checkout session completed. 
+   * @param sessionId String id returned by Stripe in the session object
+   * @returns Promise<OperationResult>
+   * @see https://stripe.com/docs/api/checkout/sessions/retrieve?lang=node
+   */
+  async finishCheckoutSession(sessionId: string): Promise<OperationResult> {
+    try {
+      const session = await this.subscriptionAdapter.retrieveSession(sessionId)
+      const userQuery = await this.userRepository.findBySubscriptionId(sessionId)
+      const isSubscribed = session.data?.payment_status === PaymentStatus.ACTIVE
+      const user = userQuery.data as UserData
+    
+      user.isSubscribed = isSubscribed
+      
+      const { success, data, error } = await this.userRepository.updateById(user)
+
+      if (!success) {
+        throw new Error(`[SubscriptionsUseCases.finishCheckoutSession] Unable to create session: ${error}`)
       }
 
       return { success, data }
@@ -45,7 +84,7 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
   async monitorSubscription(body: Object, sig: any): Promise<OperationResult> {
     try {
       const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string
-      const { success, data } = this.subscriptionAdapter.constructEvent(body, sig, endpointSecret)
+      const { success, data } = await this.subscriptionAdapter.constructEvent(body, sig, endpointSecret)
 
       if (!success) throw new Error('[SubscriptionsUseCases.monitorSubscription] Unable to create construct Event')
 
@@ -83,7 +122,7 @@ class SubscriptionsUseCases implements ISubscriptionsUseCases {
       throw new Error('[SubscriptionsUseCases.takePaymentAction] Unable subscription ID')
     }
 
-    const isSubscribed = paymentStatus === PaymentStatus.PAID
+    const isSubscribed = paymentStatus === PaymentStatus.ACTIVE
     const user = userQuery.data as UserData
   
     user.isSubscribed = isSubscribed
