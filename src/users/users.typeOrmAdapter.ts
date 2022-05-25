@@ -3,7 +3,7 @@ import { UserData, UserRepositoryResults, IUsersRepository } from './users.types
 import { userSchema } from './users.schema';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 
-class UsersTypeOrmRepository implements IUsersRepository {
+class UsersTypeOrmAdapter implements IUsersRepository {
   async create (userData: UserData): Promise<UserRepositoryResults> {
     try {
       const { email, password } = userData
@@ -15,7 +15,7 @@ class UsersTypeOrmRepository implements IUsersRepository {
         .execute()
       const success: boolean = !!userInserted.identifiers
 
-      if (!success) throw new Error('[UsersTypeOrmRepository.create] Unable to create user')
+      if (!success) throw new Error('[UsersTypeOrmAdapter.create] Unable to create user')
 
       return {
         success,
@@ -38,7 +38,7 @@ class UsersTypeOrmRepository implements IUsersRepository {
         .getMany()
       const success: boolean = !!usersFound
 
-      if (!success) throw new Error('[UsersTypeOrmRepository.findAll] Unable to get the list of users')
+      if (!success) throw new Error('[UsersTypeOrmAdapter.findAll] Unable to get the list of users')
       
       return {
         success,
@@ -62,7 +62,7 @@ class UsersTypeOrmRepository implements IUsersRepository {
         .getOne()
       const success: boolean = !!(userFound && userFound.id)
       
-      if (!success) throw new Error('[UsersTypeOrmRepository.findById] Unable to get user')
+      if (!success) throw new Error('[UsersTypeOrmAdapter.findById] Unable to get user')
 
       return {
         success,
@@ -133,7 +133,7 @@ class UsersTypeOrmRepository implements IUsersRepository {
 
       const success: boolean = !!queryResult.generatedMaps
       
-      if (!success) throw new Error('[UsersTypeOrmRepository.updateById] Unable to update user')
+      if (!success) throw new Error('[UsersTypeOrmAdapter.updateById] Unable to update user')
       
       return {
         success,
@@ -173,4 +173,4 @@ class UsersTypeOrmRepository implements IUsersRepository {
   }
 }
 
-export default UsersTypeOrmRepository
+export default UsersTypeOrmAdapter

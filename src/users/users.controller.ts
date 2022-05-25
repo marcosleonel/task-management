@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 
 import type { IUserController, UserData } from './users.types'
 import UsersUseCases from './users.useCases'
-import UsersTypeOrmRepository from './users.typeOrmRepository'
+import UsersTypeOrmAdapter from './users.typeOrmAdapter'
 import logger from '../logger'
 import { generateToken, comparePassword } from './users.helpers'
 
@@ -10,7 +10,7 @@ class UserController implements IUserController {
   readonly useCases: UsersUseCases
 
   constructor() {
-    this.useCases = new UsersUseCases(new UsersTypeOrmRepository())
+    this.useCases = new UsersUseCases(new UsersTypeOrmAdapter())
   }
 
   async add (req: Request, res: Response) {
@@ -24,7 +24,7 @@ class UserController implements IUserController {
 
     try {
       const { email, password } = req.body
-      const useCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const useCases = new UsersUseCases(new UsersTypeOrmAdapter())
       const { success } = await useCases.getUserByEmail(email)
 
       if (success) return res.status(409).json({ message: 'This e-mail was already registered'})
@@ -42,7 +42,7 @@ class UserController implements IUserController {
 
   async getAll (_, res: Response) {
     try {
-      const useCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const useCases = new UsersUseCases(new UsersTypeOrmAdapter())
       const result = await useCases.listUsers()
 
       if (result.error) throw new Error(`${result.error}`)
@@ -57,7 +57,7 @@ class UserController implements IUserController {
   async getOne (req: Request, res: Response) {
     try {
       const { id } = req.params
-      const useCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const useCases = new UsersUseCases(new UsersTypeOrmAdapter())
       const result = await useCases.getUser(id)
 
       if (result.error) throw new Error(`${result.error}`)
@@ -81,7 +81,7 @@ class UserController implements IUserController {
     try {
       const { id, email, password } = req.body
       const userData = { id, email, password }
-      const useCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const useCases = new UsersUseCases(new UsersTypeOrmAdapter())
       const result = await useCases.updateUser(userData)
 
       if (result.error) throw new Error(`${result.error}`)
@@ -96,7 +96,7 @@ class UserController implements IUserController {
   async deleteOne (req: Request, res: Response) {
     try {
       const { id } = req.params
-      const useCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const useCases = new UsersUseCases(new UsersTypeOrmAdapter())
       const result = await useCases.deleteUser(id)
 
       if (result.error) throw new Error(`${result.error}`)
@@ -119,7 +119,7 @@ class UserController implements IUserController {
     
     try {
       const { email, password } = req.body
-      const usersUseCases = new UsersUseCases(new UsersTypeOrmRepository())
+      const usersUseCases = new UsersUseCases(new UsersTypeOrmAdapter())
       const result = await usersUseCases.getUserByEmail(email)
 
       if (!result.success) {

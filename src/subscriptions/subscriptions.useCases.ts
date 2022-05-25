@@ -1,13 +1,13 @@
 import Subscriptions from './subscriptions.entity'
 import StripeAdapter from './subscriptions.stripeAdapter'
 import { ISubscriptionsUseCases, OperationResult, PaymentStatus, StripeEvent, SubscriptionStatus } from './subscriptions.types'
-import { UserData, UsersTypeOrmRepository } from '../users' 
+import { UserData, UsersTypeOrmAdapter } from '../users' 
 
 class SubscriptionsUseCases implements ISubscriptionsUseCases {
   readonly subscriptionAdapter: StripeAdapter
-  readonly userRepository: UsersTypeOrmRepository
+  readonly userRepository: UsersTypeOrmAdapter
 
-  constructor(subscriptionAdapter: StripeAdapter, userRepository: UsersTypeOrmRepository) {
+  constructor(subscriptionAdapter: StripeAdapter, userRepository: UsersTypeOrmAdapter) {
     this.subscriptionAdapter = subscriptionAdapter
     this.userRepository = userRepository
   }

@@ -6,7 +6,6 @@ import {
   UserRepositoryResults
 } from './users.types'
 import Users from './users.entity'
-import logger from '../logger'
 
 class UsersUseCases implements IUserUseCases {
   readonly userRepository: IUsersRepository
@@ -73,9 +72,6 @@ class UsersUseCases implements IUserUseCases {
   async getUserByEmail (email: string): Promise<UserRepositoryResults> {
     try {
       const { data, success } = await this.userRepository.findByEmail(email)
-
-      logger.warn(`[useCase]: success: ${success}`)
-      logger.warn(`[useCase]: data: ${JSON.stringify(data)}`)
 
       if (!success) throw new Error('[UsersUseCases.getUserByEmail] Unable to get user')
 

@@ -1,9 +1,9 @@
 import { EntitySchema, EntitySchemaOptions } from 'typeorm'
 
-import { UserData } from './users.types'
+import { TaskData } from './tasks.types'
 
-export const userSchema = new EntitySchema({
-  name: 'users',
+export const taskSchema = new EntitySchema({
+  name: 'tasks',
   columns: {
     id: {
       type: 'uuid',
@@ -11,29 +11,17 @@ export const userSchema = new EntitySchema({
       generated: 'uuid',
       unique: true
     },
-    email: { 
+    description: { 
       type: 'varchar',
       nullable: false,
       unique: true,
       length: 255
     },
-    password: {
-      type: 'varchar',
-      nullable: false,
-      length: 255
-    },
-    isSubscribed: {
-      name: 'is_subscribed',
+    isDone: {
+      name: 'is_done',
       type: 'boolean',
       nullable: false,
       default: false
-    },
-    subscriptionId: {
-      name: 'subscription_id',
-      type: 'varchar',
-      nullable: true,
-      unique: true,
-      length: 255
     },
     createdAt: {
       name: 'created_at',
@@ -44,14 +32,16 @@ export const userSchema = new EntitySchema({
       name: 'updated_at',
       type: 'timestamp with time zone',
       updateDate: true,
-    }
+    },
   },
   relations: {
-    tasks: {
-      type: 'one-to-many',
-      target: 'tasks',
-      cascade: true,
-      inverseSide: 'user'
+    user: {
+      type: 'many-to-one',
+      target: 'users',
+      joinColumn: {
+        name: 'user_id'
+      },
+      inverseSide: 'tasks'
     }
   }
-} as EntitySchemaOptions<UserData>)
+} as EntitySchemaOptions<TaskData>)

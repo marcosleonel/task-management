@@ -5,18 +5,18 @@ import logger from '../logger'
 import StripeAdapter from './subscriptions.stripeAdapter'
 import { ISusbscriptionsController, StripeSession } from './subscriptions.types'
 import SubscriptionsUseCases from './subscriptions.useCases'
-import { UsersTypeOrmRepository } from '../users'
+import { UsersTypeOrmAdapter } from '../users'
 
 class SusbscriptionsController implements ISusbscriptionsController {
   readonly useCases: SubscriptionsUseCases
 
   constructor() {
-    this.useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+    this.useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmAdapter())
   }
 
   async createSession (req: Request, res: Response) {
     try {
-      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmAdapter())
       const id = req.auth?.id as string
       const email = req.auth?.email as string
       const appUrl = `${req.protocol}://${req.hostname}`
@@ -38,7 +38,7 @@ class SusbscriptionsController implements ISusbscriptionsController {
   async finishSession (req: Request, res: Response) {
     try {
       const { sessionId } = req.body
-      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmAdapter())
       const { success, error } = await useCases.finishCheckoutSession(sessionId)
 
       if (!success) {
@@ -55,7 +55,7 @@ class SusbscriptionsController implements ISusbscriptionsController {
   async handleEvent (req: Request, res: Response) {
     try {
       const sig = req.headers['stripe-signature']
-      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmRepository())
+      const useCases = new SubscriptionsUseCases(new StripeAdapter(), new UsersTypeOrmAdapter())
       const { success } = await useCases.monitorSubscription(req.body, sig)
 
       if (!success) throw new Error('[SusbscriptionsController.handleEvent] Unable to create session')
