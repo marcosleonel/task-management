@@ -5,6 +5,7 @@ import helmet from 'helmet'
 
 import { userRouter } from '../users'
 import { subscriptionRouter } from '../subscriptions'
+import { taskRouter } from '../tasks'
 import logger from '../logger'
 
 const app = express()
@@ -16,6 +17,7 @@ app.use(helmet())
 
 const apiVersion1 = '/api/v1'
 app.use(apiVersion1, userRouter)
+app.use(apiVersion1, taskRouter)
 app.use(apiVersion1, subscriptionRouter)
 
 app.use((err, _req, res, _next) => {

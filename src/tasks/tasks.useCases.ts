@@ -16,7 +16,7 @@ class TasksUseCases implements ITaskUseCases {
     const newTask = new Tasks(taskData.description as string, taskData.isDone as boolean)
     const validation = newTask.validate()
 
-    if (validation.errors) return validation
+    if (validation.error) return validation
 
     try {
       const { data, success } = await this.taskRepository.create(taskData)

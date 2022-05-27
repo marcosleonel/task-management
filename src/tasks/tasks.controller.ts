@@ -8,18 +8,12 @@ import {
 import logger from '../logger'
 
 class TaskController implements ITasksController {
-  readonly useCases: TaskUseCases
-
-  constructor() {
-    this.useCases = new TaskUseCases(new TasksTypeOrmAdapter())
-  }
-
   async add (req: Request, res: Response) {
     if (!req.body) {
       return res.status(400).json({ message: 'body is required' })
     }
 
-    if (!req.body.description || !req.body.isDone) {
+    if ((req.body.description.length <= 0) || (req.body.isDone.length <= 0)) {
       return res.status(400).json({ message: 'description and isDone are required' })
     }
 
@@ -80,7 +74,8 @@ class TaskController implements ITasksController {
     }
 
     try {
-      const { id, description, isDone } = req.body
+      const { description, isDone } = req.body
+      const { id } = req.params
       const userData = { id, description, isDone }
       const useCases = new TaskUseCases(new TasksTypeOrmAdapter())
       const result = await useCases.updateTask(userData)

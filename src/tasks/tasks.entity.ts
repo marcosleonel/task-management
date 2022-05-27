@@ -9,13 +9,13 @@ class Tasks {
   }
 
   validate () {
-    const errors = this.description.length < 255 
+    const error = this.description.length > 255 
       ? 'Description should have less then 255 characters'
       : false
 
     return {
-      success: !errors,
-      errors,
+      success: !error,
+      error,
       data: {
         email: this.description,
         password: this.isDone

@@ -84,7 +84,7 @@ class TasksTypeOrmAdapter implements ITasksRepository {
         .createQueryBuilder('tasks')
         .where('description = :description', { description })
         .getOne()
-      const success: boolean = !!(taskFound && taskFound.description === description)
+      const success: boolean = taskFound!.description === description
 
       return {
         success,

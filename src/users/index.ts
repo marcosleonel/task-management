@@ -2,7 +2,7 @@ import UserController from './users.controller'
 import Users from './users.entity'
 import { userSchema } from './users.schema'
 import userRouter from './users.routes'
-import UsersTypeOrmAdapter from './users.typeOrmRepository'
+import UsersTypeOrmAdapter from './users.typeOrmAdapter'
 import UsersUseCases from './users.useCases'
 import type { UserData, UserRepositoryResults } from './users.types'
 
